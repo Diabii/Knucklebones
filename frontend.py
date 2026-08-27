@@ -6,12 +6,12 @@ WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
 
 # Kolory
-BACKGROUND_COLOR = (28, 24, 32)
-SLOT_COLOR = (78, 68, 88)
-SLOT_BORDER_COLOR = (150, 130, 165)
+BACKGROUND_COLOR = (43, 23, 3)
+SLOT_COLOR = (148, 127, 91)
+SLOT_BORDER_COLOR = (69, 59, 42)
 
 # Rozmiary pól
-SLOT_SIZE = 70
+SLOT_SIZE = 90
 
 # Przerwa między polami w tej samej kolumnie
 ROW_GAP = 8
@@ -37,15 +37,15 @@ def draw_slot(screen, x, y):
         screen,
         SLOT_COLOR,
         slot_rect,
-        border_radius=8
+        border_radius=10
     )
 
     pygame.draw.rect(
         screen,
         SLOT_BORDER_COLOR,
         slot_rect,
-        width=2,
-        border_radius=8
+        width=3,
+        border_radius=10
     )
 
 
