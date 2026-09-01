@@ -1,135 +1,206 @@
+from pathlib import Path
+
 import pygame
 
 
-# Rozdzielczość 16:9
+# Okno 16:9
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
 
-# Kolory
-BACKGROUND_COLOR = (43, 23, 3)
-SLOT_COLOR = (148, 127, 91)
-SLOT_BORDER_COLOR = (69, 59, 42)
+BACKGROUND_COLOR = (205, 229, 245)
+TEXT_COLOR_1 = (176, 129, 77)
+TEXT_COLOR_2 = (83, 120, 95)
 
-# Rozmiary pól
-SLOT_SIZE = 90
+# Folder, w którym znajduje się frontend.py
+BASE_DIR = Path(__file__).resolve().parent
 
-# Przerwa między polami w tej samej kolumnie
-ROW_GAP = 8
+# Folder z grafikami
+GRAPHICS_DIR = BASE_DIR / "Graphics"
 
-# Większa przerwa między kolumnami
+# Ścieżki do grafik
+COLUMN_GREEN_PATH = GRAPHICS_DIR / "column_green.png"
+COLUMN_ORANGE_PATH = GRAPHICS_DIR / "column_orange.png"
+DESK_GREEN_PATH = GRAPHICS_DIR / "desk_green.png"
+DESK_ORANGE_PATH = GRAPHICS_DIR / "desk_orange.png"
+FONT_PATH = GRAPHICS_DIR / "pixel.ttf"
+
+# Rozmiar jednej całej kolumny, czyli 3 miejsca pionowo
+COLUMN_WIDTH = 100
+COLUMN_HEIGHT = 290
+
+# Przerwa między gotowymi grafikami kolumn
 COLUMN_GAP = 28
 
+# Rozmiar miejsca do rzucania kostką
+DESK_WIDTH = 240
+DESK_HEIGHT = 160
+
 # Odległość między planszami graczy
-PLAYERS_GAP = 100
+PLAYERS_GAP = 80
 
 
-def draw_slot(screen, x, y):
-    """Rysuje jedno kwadratowe miejsce na kostkę."""
+def load_image(path, size):
+    """
+    Wczytuje grafikę, zachowuje przezroczystość
+    i skaluje ją do podanego rozmiaru.
+    """
 
-    slot_rect = pygame.Rect(
-        x,
-        y,
-        SLOT_SIZE,
-        SLOT_SIZE
-    )
+    image = pygame.image.load(str(path)).convert_alpha()
 
-    pygame.draw.rect(
-        screen,
-        SLOT_COLOR,
-        slot_rect,
-        border_radius=10
-    )
-
-    pygame.draw.rect(
-        screen,
-        SLOT_BORDER_COLOR,
-        slot_rect,
-        width=3,
-        border_radius=10
+    return pygame.transform.smoothscale(
+        image,
+        size
     )
 
 
-def get_board_size():
-    """Zwraca szerokość i wysokość jednej planszy 3x3."""
+def load_graphics():
+    """Wczytuje wszystkie grafiki potrzebne do frontendu."""
 
-    board_width = (
-        3 * SLOT_SIZE
+    return {
+        "column_green": load_image(
+            COLUMN_GREEN_PATH,
+            (COLUMN_WIDTH, COLUMN_HEIGHT)
+        ),
+        "column_orange": load_image(
+            COLUMN_ORANGE_PATH,
+            (COLUMN_WIDTH, COLUMN_HEIGHT)
+        ),
+        "desk_green": load_image(
+            DESK_GREEN_PATH,
+            (DESK_WIDTH, DESK_HEIGHT)
+        ),
+        "desk_orange": load_image(
+            DESK_ORANGE_PATH,
+            (DESK_WIDTH, DESK_HEIGHT)
+        )
+    }
+
+
+def get_board_width():
+    """Zwraca szerokość trzech kolumn wraz z przerwami."""
+
+    return (
+        3 * COLUMN_WIDTH
         + 2 * COLUMN_GAP
     )
 
-    board_height = (
-        3 * SLOT_SIZE
-        + 2 * ROW_GAP
-    )
 
-    return board_width, board_height
-
-
-def draw_board(screen, start_x, start_y):
+def draw_board(screen, column_image, start_x, start_y):
     """
-    Rysuje planszę 3 kolumny na 3 miejsca.
-
-    Większa przerwa jest między kolumnami,
-    mniejsza między miejscami w kolumnie.
+    Wyświetla trzy gotowe grafiki kolumn obok siebie.
+    Każda grafika zawiera już trzy miejsca pionowo.
     """
 
     for column_index in range(3):
         x = start_x + column_index * (
-            SLOT_SIZE + COLUMN_GAP
+            COLUMN_WIDTH + COLUMN_GAP
         )
 
-        for row_index in range(3):
-            y = start_y + row_index * (
-                SLOT_SIZE + ROW_GAP
-            )
-
-            draw_slot(screen, x, y)
+        screen.blit(
+            column_image,
+            (x, start_y)
+        )
 
 
-def draw_game(screen):
-    """Rysuje obie plansze graczy."""
+def draw_player_label(screen, font, text, desk_x, desk_y, color):
+    """Wyświetla nazwę gracza nad jego miejscem do rzucania."""
 
-    board_width, board_height = get_board_size()
+    label = font.render(
+        text,
+        True,
+        color
+    )
 
-    # Wyśrodkowanie plansz w poziomie
+    label_rect = label.get_rect(
+        centerx=desk_x + DESK_WIDTH // 2,
+        bottom=desk_y - 10
+    )
+
+    screen.blit(label, label_rect)
+
+
+def draw_game(screen, graphics, font):
+    """Wyświetla statyczny układ obu graczy."""
+
+    board_width = get_board_width()
+
+    # Plansze są wyśrodkowane w poziomie
     board_x = (
         WINDOW_WIDTH - board_width
     ) // 2
 
-    # Łączna wysokość obu plansz i przerwy między nimi
     all_boards_height = (
-        board_height * 2
+        2 * COLUMN_HEIGHT
         + PLAYERS_GAP
     )
 
-    # Wyśrodkowanie całego układu w pionie
-    opponent_board_y = (
+    # Plansza pomarańczowego gracza u góry
+    orange_board_y = (
         WINDOW_HEIGHT - all_boards_height
     ) // 2
 
-    player_board_y = (
-        opponent_board_y
-        + board_height
+    # Plansza zielonego gracza na dole
+    green_board_y = (
+        orange_board_y
+        + COLUMN_HEIGHT
         + PLAYERS_GAP
     )
 
-    # Przeciwnik u góry
+    # Gracz 1, pomarańczowy, u góry
     draw_board(
         screen,
+        graphics["column_orange"],
         board_x,
-        opponent_board_y
+        orange_board_y
     )
 
-    # Gracz na dole
+    # Gracz 2, zielony, na dole
     draw_board(
         screen,
+        graphics["column_green"],
         board_x,
-        player_board_y
+        green_board_y
+    )
+
+    # Pomarańczowe miejsce do rzucania, prawy górny róg
+    orange_desk_x = WINDOW_WIDTH - DESK_WIDTH - 45
+    orange_desk_y = 65
+
+    screen.blit(
+        graphics["desk_orange"],
+        (orange_desk_x, orange_desk_y)
+    )
+
+    # Zielone miejsce do rzucania, lewy dolny róg
+    green_desk_x = 45
+    green_desk_y = WINDOW_HEIGHT - DESK_HEIGHT - 45
+
+    screen.blit(
+        graphics["desk_green"],
+        (green_desk_x, green_desk_y)
+    )
+
+    draw_player_label(
+        screen,
+        font,
+        "Player 1",
+        orange_desk_x,
+        orange_desk_y,
+        TEXT_COLOR_1
+    )
+    
+    draw_player_label(
+        screen,
+        font,
+        "Player 2",
+        green_desk_x,
+        green_desk_y,
+        TEXT_COLOR_2
     )
 
 
 def run_frontend():
-    """Uruchamia samo okno gry, bez mechaniki."""
+    """Uruchamia statyczny frontend bez mechaniki gry."""
 
     pygame.init()
 
@@ -138,6 +209,11 @@ def run_frontend():
     )
 
     pygame.display.set_caption("Knucklebones")
+
+    # Zwykła domyślna czcionka pygame
+    font = pygame.font.Font(str(FONT_PATH), 24)
+
+    graphics = load_graphics()
 
     clock = pygame.time.Clock()
     running = True
@@ -149,7 +225,11 @@ def run_frontend():
 
         screen.fill(BACKGROUND_COLOR)
 
-        draw_game(screen)
+        draw_game(
+            screen,
+            graphics,
+            font
+        )
 
         pygame.display.flip()
         clock.tick(60)
