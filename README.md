@@ -32,6 +32,8 @@ The game ends when either player's board is completely filled.
 
 <div align="left">
 
+---
+
 ### Repository Structure
 
 ```text
