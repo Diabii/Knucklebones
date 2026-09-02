@@ -23,11 +23,11 @@ The game ends when either player's board is completely filled.
 
 <div align="center">
 
-<img src="Graphics/dice_1.png" width="80"> &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;
-<img src="Graphics/dice_2.png" width="80"> &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; 
-<img src="Graphics/dice_3.png" width="80"> &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;
-<img src="Graphics/dice_4.png" width="80"> &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;
-<img src="Graphics/dice_5.png" width="80"> &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;
+<img src="Graphics/dice_1.png" width="80"> &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;
+<img src="Graphics/dice_2.png" width="80"> &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;
+<img src="Graphics/dice_3.png" width="80"> &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;
+<img src="Graphics/dice_4.png" width="80"> &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;
+<img src="Graphics/dice_5.png" width="80"> &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;
 <img src="Graphics/dice_6.png" width="80"> 
 
 <div align="left">
