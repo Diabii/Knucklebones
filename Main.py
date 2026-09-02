@@ -2,21 +2,18 @@ import random
 from collections import Counter
 
 
+# Creates a 3x3 board with None values
 def create_board():
-    """Tworzy pustą planszę z trzema kolumnami."""
-
     return [[None] * 3 for _ in range(3)]
 
 
+# Rolls a die and returns a number between 1 and 6
 def roll_die():
-    """Losuje liczbę oczek od 1 do 6."""
-
     return random.randint(1, 6)
 
 
+# Calculates the score for a single column based on the rules of Knucklebones
 def calculate_column_score(column):
-    """Oblicza wynik jednej kolumny."""
-
     numbers = [
         value
         for value in column
@@ -33,11 +30,8 @@ def calculate_column_score(column):
     return score
 
 
+# Calculates the total score for all columns and returns a dictionary with individual column scores and the total score
 def calculate_score(columns):
-    """
-    Zwraca wyniki każdej kolumny osobno oraz total.
-    """
-
     column_scores = [
         calculate_column_score(column)
         for column in columns
@@ -49,14 +43,8 @@ def calculate_score(columns):
     }
 
 
+# Places a die in the first available index of the specified column. Returns True if successful, False if the column is full.
 def place_die(columns, column_index, pips):
-    """
-    Umieszcza kostkę na pierwszym wolnym indeksie.
-
-    Index 0 ma inne położenie wizualne dla obu graczy,
-    ale mechanicznie nadal jest pierwszym wolnym miejscem.
-    """
-
     column = columns[column_index]
 
     for index in range(3):
@@ -67,18 +55,12 @@ def place_die(columns, column_index, pips):
     return False
 
 
+# Removes all identical dice from the opponent's corresponding column and shifts the remaining dice towards index 0.
 def remove_opponent_dice(
     opponent_columns,
     column_index,
     pips
 ):
-    """
-    Usuwa wszystkie identyczne kości przeciwnika
-    z odpowiadającej kolumny.
-
-    Pozostałe kości przesuwa w stronę indeksu 0.
-    """
-
     opponent_column = opponent_columns[column_index]
 
     remaining_dice = [
@@ -93,21 +75,13 @@ def remove_opponent_dice(
     )
 
 
+# Executes a full move: places a die and removes identical dice from the opponent's column. Returns True if the move was successful, False if the column was full.
 def make_move(
     player_columns,
     opponent_columns,
     column_index,
     pips
 ):
-    """
-    Wykonuje pełny ruch:
-    1. umieszcza kostkę,
-    2. zbija identyczne kości przeciwnika.
-
-    Zwraca True, jeśli ruch został wykonany.
-    Zwraca False, jeśli kolumna była pełna.
-    """
-
     die_placed = place_die(
         player_columns,
         column_index,
@@ -126,9 +100,8 @@ def make_move(
     return True
 
 
+# Checks if all positions on the board are occupied. Returns True if the board is full, False otherwise.
 def full_board(columns):
-    """Sprawdza, czy wszystkie miejsca są zajęte."""
-
     return all(
         value is not None
         for column in columns
@@ -136,9 +109,8 @@ def full_board(columns):
     )
 
 
+# Prints the current state of the board and the player's scores in the console.
 def print_board(player, columns):
-    """Wyświetla planszę i wyniki gracza w konsoli."""
-
     print(f"\nBoard of Player {player}:")
 
     for index, column in enumerate(columns, start=1):
@@ -150,8 +122,7 @@ def print_board(player, columns):
     print("Total:", score["total"])
 
 
+# Prints the state of both players' boards and their scores in the console.
 def print_game_state(player_1_columns, player_2_columns):
-    """Wyświetla stan obu plansz i punktację."""
-
     print_board(1, player_1_columns)
     print_board(2, player_2_columns)

@@ -641,9 +641,7 @@ def create_new_game():
     return {
         "player_1_columns": mechanics.create_board(),
         "player_2_columns": mechanics.create_board(),
-        "current_player": random.choice(
-            [1, 2]
-        ),
+        "current_player": random.choice([1, 2]),
         "current_pips": mechanics.roll_die(),
         "displayed_pips": random.randint(1, 6),
         "rolling": True,
