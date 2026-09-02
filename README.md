@@ -64,4 +64,4 @@ This project is a non-commercial fan project created for learning and programmin
 
 ---
 
-### Have fun! 🎲
+### **Have fun! 🎲**
