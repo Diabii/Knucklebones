@@ -1,43 +1,62 @@
 from pathlib import Path
 import random
-
 import pygame
-import Main as mechanics
+import main as mechanics
 
 
-# Okno 16:9
+# Dimensions and placement
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
 
-BACKGROUND_COLOR = (205, 229, 245)
-
 TEXT_COLOR_1 = (176, 129, 77)
 TEXT_COLOR_2 = (83, 120, 95)
-
 TEXT_COLOR_1W = (252, 241, 227)
 TEXT_COLOR_2W = (211, 242, 222)
+RULES_TEXT_COLOR = (221, 148, 252)
 
 MENU_TITLE_Y = 190
-
 MENU_PLAY_Y = 380
 MENU_RULES_Y = 500
+MENU_DICE_Y = (150, 375, 600)
 
-MENU_LEFT_DICE_X = 125
-MENU_RIGHT_DICE_MARGIN = 125
+COLUMN_WIDTH = 130
+COLUMN_HEIGHT = 290
+COLUMN_GAP = 28
+PLAYERS_GAP = 80
 
-MENU_DICE_Y = (
-    150,
-    375,
-    600
-)
+DESK_WIDTH = 240
+DESK_HEIGHT = 160
+
+BOARD_DICE_SIZE = 70
+DESK_DICE_SIZE = 100
+MENU_DICE_SIZE = 160
+
+ROLL_DURATION = 1000
+ROLL_FRAME_TIME = 50
+
+BIG_BUTTON_WIDTH = 294
+BIG_BUTTON_HEIGHT = 120
+SMALL_BUTTON_WIDTH = 222
+SMALL_BUTTON_HEIGHT = 84
+
+OVERLAY_ALPHA = 200
+
+RULES_BACKGROUND_WIDTH = 760
+RULES_BACKGROUND_HEIGHT = 520
+RULES_WINDOW_X = (
+    WINDOW_WIDTH - RULES_BACKGROUND_WIDTH
+) // 2
+RULES_WINDOW_Y = (
+    WINDOW_HEIGHT - RULES_BACKGROUND_HEIGHT
+) // 2
+
+CLOSE_BUTTON_SIZE = 48
 
 
-# Foldery
+# Paths to graphics
 BASE_DIR = Path(__file__).resolve().parent
 GRAPHICS_DIR = BASE_DIR / "Graphics"
 
-
-# Ścieżki do grafik
 COLUMN_GREEN_PATH = GRAPHICS_DIR / "column_green.png"
 COLUMN_ORANGE_PATH = GRAPHICS_DIR / "column_orange.png"
 DESK_GREEN_PATH = GRAPHICS_DIR / "desk_green.png"
@@ -48,7 +67,6 @@ BUTTON_RULES_PATH = GRAPHICS_DIR / "button_rules.png"
 BUTTON_RETRY_PATH = GRAPHICS_DIR / "button_retry.png"
 RULES_BACKGROUND_PATH = GRAPHICS_DIR / "rules_background.png"
 CLOSE_BUTTON_PATH = GRAPHICS_DIR / "X.png"
-
 DICE_PATHS = {
     "normal": {
         pips: GRAPHICS_DIR / f"dice_{pips}.png"
@@ -63,73 +81,13 @@ DICE_PATHS = {
         for pips in range(1, 7)
     }
 }
-
 BACKGROUND_PATH = GRAPHICS_DIR / "background.png"
 
-# Rozmiar jednej całej kolumny
-COLUMN_WIDTH = 130
-COLUMN_HEIGHT = 290
 
-# Odległość między kolumnami
-COLUMN_GAP = 28
+# FUNCTIONS
 
-# Rozmiar miejsca do rzucania
-DESK_WIDTH = 240
-DESK_HEIGHT = 160
-
-# Rozmiar kostki umieszczonej w kolumnie
-BOARD_DICE_SIZE = 70
-
-# Rozmiar kostki wyświetlanej na biurku
-DESK_DICE_SIZE = 100
-
-MENU_DICE_SIZE = 160
-
-# Czas trwania animacji rzutu w milisekundach
-ROLL_DURATION = 1000
-
-# Co ile milisekund zmienia się grafika podczas rzutu
-ROLL_FRAME_TIME = 50
-
-# Odległość między planszami
-PLAYERS_GAP = 80
-
-# Rozmiary przycisków
-BIG_BUTTON_WIDTH = 294   # 49
-BIG_BUTTON_HEIGHT = 120   # 20
-
-SMALL_BUTTON_WIDTH = 222   # 37
-SMALL_BUTTON_HEIGHT = 84   # 14
-
-# Przyciemnienie menu i ekranu końcowego
-OVERLAY_ALPHA = 200
-
-# Okno zasad
-RULES_BACKGROUND_WIDTH = 760
-RULES_BACKGROUND_HEIGHT = 520
-
-# Przycisk X
-CLOSE_BUTTON_SIZE = 48
-
-# Pozycja okna zasad
-RULES_WINDOW_X = (
-    WINDOW_WIDTH - RULES_BACKGROUND_WIDTH
-) // 2
-
-RULES_WINDOW_Y = (
-    WINDOW_HEIGHT - RULES_BACKGROUND_HEIGHT
-) // 2
-
-# Kolor tekstu zasad, taki jak przycisk RULES
-RULES_TEXT_COLOR = (221, 148, 252)
-
-
+# Loading and scaling graphics
 def load_image(path, size):
-    """
-    Wczytuje grafikę, zachowuje przezroczystość
-    i skaluje ją do podanego rozmiaru.
-    """
-
     image = pygame.image.load(
         str(path)
     ).convert_alpha()
@@ -140,9 +98,8 @@ def load_image(path, size):
     )
 
 
+# Loading all graphics
 def load_graphics():
-    """Wczytuje wszystkie grafiki."""
-
     graphics = {
         "background": load_image(
             BACKGROUND_PATH,
@@ -193,14 +150,12 @@ def load_graphics():
         ),
         "menu_dice": {},
 
-        # Kostki na planszy w trzech wariantach
         "board_dice": {
             "normal": {},
             "yellow": {},
             "red": {}
         },
 
-        # Kostki na biurku zawsze pozostają zwykłe
         "desk_dice": {}
     }
 
@@ -220,7 +175,6 @@ def load_graphics():
             (BOARD_DICE_SIZE, BOARD_DICE_SIZE)
         )
 
-        # Animacja rzutu na biurku używa zwykłych białych kostek
         graphics["desk_dice"][pips] = load_image(
             DICE_PATHS["normal"][pips],
             (DESK_DICE_SIZE, DESK_DICE_SIZE)
@@ -233,12 +187,9 @@ def load_graphics():
 
     return graphics
 
-def wrap_text(text, font, max_width):
-    """
-    Dzieli tekst na linie mieszczące się
-    w podanej szerokości.
-    """
 
+# Wrap text function for rules window
+def wrap_text(text, font, max_width):
     words = text.split()
     lines = []
     current_line = ""
@@ -265,6 +216,8 @@ def wrap_text(text, font, max_width):
 
     return lines
 
+
+# Drawing functions for UI elements, game state, and overlays are defined below.
 def draw_close_button(
     screen,
     close_image,
@@ -272,11 +225,6 @@ def draw_close_button(
     mouse_position,
     mouse_pressed
 ):
-    """
-    Rysuje przycisk X z efektem hover i pressed.
-    Zwraca jego klikalny prostokąt.
-    """
-
     base_rect = close_image.get_rect(
         center=center
     )
@@ -341,6 +289,7 @@ def draw_close_button(
 
     return base_rect
 
+
 def draw_rules_window(
     screen,
     graphics,
@@ -348,12 +297,6 @@ def draw_rules_window(
     rules_text_font,
     rules_fun_font
 ):
-    """
-    Przyciemnia menu i wyświetla okno zasad.
-
-    Zwraca prostokąt przycisku X.
-    """
-
     draw_dark_overlay(screen)
 
     panel_x = RULES_WINDOW_X
@@ -437,7 +380,6 @@ def draw_rules_window(
             line_rect
         )
 
-    # Have fun
     have_fun_surface = rules_fun_font.render(
         "HAVE FUN!",
         True,
@@ -459,9 +401,8 @@ def draw_rules_window(
     return close_rect
 
 
+# Overlay function 
 def draw_dark_overlay(screen):
-    """Nakłada półprzezroczyste przyciemnienie na ekran."""
-
     overlay = pygame.Surface(
         (WINDOW_WIDTH, WINDOW_HEIGHT),
         pygame.SRCALPHA
@@ -476,6 +417,7 @@ def draw_dark_overlay(screen):
         (0, 0)
     )
 
+
 def draw_button(
     screen,
     button_image,
@@ -486,16 +428,6 @@ def draw_button(
     mouse_position,
     mouse_pressed
 ):
-    """
-    Rysuje dowolny przycisk z efektem hover i pressed.
-
-    Rozmiar jest pobierany bezpośrednio z grafiki,
-    więc funkcja działa zarówno dla dużego PLAY,
-    jak i małych RULES oraz RETRY.
-
-    Zwraca stały pygame.Rect używany do kliknięcia.
-    """
-
     base_rect = button_image.get_rect(
         center=center
     )
@@ -509,7 +441,6 @@ def draw_button(
         and mouse_pressed
     )
 
-    # Jednolity hover dla wszystkich rozmiarów
     if is_hovered:
         scale = 1.04
     else:
@@ -538,7 +469,6 @@ def draw_button(
         center=center
     )
 
-    # Wciśnięcie przesuwa cały przycisk lekko w dół
     if is_pressed:
         displayed_rect.y += 3
 
@@ -547,7 +477,6 @@ def draw_button(
         displayed_rect
     )
 
-    # Renderujemy wyłącznie napis aktualnego przycisku
     button_text = button_font.render(
         text,
         True,
@@ -565,9 +494,8 @@ def draw_button(
         text_rect
     )
 
-    # Obszar klikalny ma bazowy rozmiar grafiki.
-    # Nie zmienia się podczas hover.
     return base_rect
+
 
 def draw_menu(
     screen,
@@ -579,18 +507,11 @@ def draw_menu(
     footer_font,
     dice_positions_y
 ):
-    """
-    Wyświetla ekran startowy.
-
-    Zwraca prostokąty przycisków PLAY i RULES.
-    """
-
     screen.blit(
         graphics["background"],
         (0, 0)
     )
 
-    # Dekoracyjne kostki po lewej: 1, 2, 3
     left_x = 125
 
     for pips, y in zip(
@@ -608,7 +529,6 @@ def draw_menu(
             die_rect
         )
 
-    # Dekoracyjne kostki po prawej: 4, 5, 6
     right_x = WINDOW_WIDTH - 125
 
     for pips, y in zip(
@@ -626,7 +546,6 @@ def draw_menu(
             die_rect
         )
 
-    # Tytuł
     title = title_font.render(
         "KNUCKLEBONES",
         True,
@@ -676,7 +595,6 @@ def draw_menu(
         mouse_pressed=mouse_pressed
     )
 
-    # Stopka
     author_text = footer_font.render(
         "Programmed by Diabi",
         True,
@@ -715,9 +633,9 @@ def draw_menu(
 
     return play_rect, rules_rect
 
-def create_new_game():
-    """Tworzy i zwraca początkowy stan nowej gry."""
 
+# Creating new game function
+def create_new_game():
     start_time = pygame.time.get_ticks()
 
     return {
@@ -736,22 +654,14 @@ def create_new_game():
 
 
 def get_board_width():
-    """Zwraca szerokość trzech kolumn wraz z przerwami."""
-
     return (
         3 * COLUMN_WIDTH
         + 2 * COLUMN_GAP
     )
 
 
+# Calculating layouts and positions for boards, desks, and columns
 def get_layout():
-    """
-    Oblicza pozycje plansz oraz biurek.
-
-    Zwraca je w jednym słowniku, żeby rysowanie
-    i obsługa kliknięć korzystały z tych samych pozycji.
-    """
-
     board_width = get_board_width()
 
     board_x = (
@@ -798,11 +708,8 @@ def get_layout():
     }
 
 
+# Creating clickable rectangles for columns
 def get_column_rects(board_x, board_y):
-    """
-    Tworzy prostokąty klikalne dla trzech kolumn.
-    """
-
     column_rects = []
 
     for column_index in range(3):
@@ -822,6 +729,7 @@ def get_column_rects(board_x, board_y):
     return column_rects
 
 
+# Showing player information
 def draw_player_info(
     screen,
     label_font,
@@ -833,20 +741,6 @@ def draw_player_info(
     color,
     info_position
 ):
-    """
-    Wyświetla nazwę gracza i total score.
-
-    info_position == "above":
-        Player
-        Score
-        biurko
-
-    info_position == "below":
-        biurko
-        Score
-        Player
-    """
-
     label = label_font.render(
         player_name,
         True,
@@ -862,7 +756,6 @@ def draw_player_info(
     desk_center_x = desk_x + DESK_WIDTH // 2
 
     if info_position == "above":
-        # Player 2 pozostaje nad biurkiem
         label_rect = label.get_rect(
             centerx=desk_center_x,
             bottom=desk_y - 30
@@ -874,8 +767,6 @@ def draw_player_info(
         )
 
     else:
-        # Player 1 pod biurkiem:
-        # najpierw Score, niżej Player 1
         score_rect = score_text.get_rect(
             centerx=desk_center_x,
             top=desk_y + DESK_HEIGHT - 5
@@ -890,6 +781,7 @@ def draw_player_info(
     screen.blit(score_text, score_rect)
 
 
+# Showing the rolled die on the active player's desk
 def draw_rolled_die(
     screen,
     dice_images,
@@ -897,11 +789,6 @@ def draw_rolled_die(
     desk_x,
     desk_y
 ):
-    """
-    Wyświetla grafikę aktualnej kostki
-    na środku biurka aktywnego gracza.
-    """
-
     die_image = dice_images[pips]
 
     die_rect = die_image.get_rect(
@@ -917,6 +804,7 @@ def draw_rolled_die(
     )
 
 
+# Calculating the center position of a die in a specific slot
 def get_die_center(
     board_x,
     board_y,
@@ -924,16 +812,6 @@ def get_die_center(
     data_index,
     player
 ):
-    """
-    Zwraca środek konkretnego pola w kolumnie.
-
-    Player 1:
-    index 0 znajduje się na dole.
-
-    Player 2:
-    index 0 znajduje się na górze.
-    """
-
     x = (
         board_x
         + column_index * (
@@ -958,6 +836,7 @@ def get_die_center(
     return x, y
 
 
+# Showing the dice in their respective slots with correct colors
 def draw_dice(
     screen,
     dice_images,
@@ -966,15 +845,6 @@ def draw_dice(
     board_y,
     player
 ):
-    """
-    Wyświetla grafiki postawionych kostek.
-
-    Jeśli dana wartość występuje w kolumnie:
-    - 1 raz: kostka biała,
-    - 2 razy: obie kostki żółte,
-    - 3 razy: wszystkie trzy kostki czerwone.
-    """
-
     for column_index, column in enumerate(columns):
 
         for data_index, pips in enumerate(column):
@@ -1014,6 +884,7 @@ def draw_dice(
             )
 
 
+# Shows column scores
 def draw_column_scores(
     screen,
     font,
@@ -1023,13 +894,6 @@ def draw_column_scores(
     player,
     color
 ):
-    """
-    Wyświetla wynik każdej kolumny.
-
-    Player 1: wyniki pod planszą.
-    Player 2: wyniki nad planszą.
-    """
-
     for column_index, column_score in enumerate(column_scores):
 
         column_center_x = (
@@ -1060,6 +924,7 @@ def draw_column_scores(
         screen.blit(score_text, score_rect)
 
 
+# Shows columns and dice
 def draw_board(
     screen,
     column_image,
@@ -1069,11 +934,6 @@ def draw_board(
     start_y,
     player
 ):
-    """
-    Wyświetla grafiki trzech kolumn
-    oraz umieszczone w nich kostki.
-    """
-
     for column_index in range(3):
         x = start_x + column_index * (
             COLUMN_WIDTH + COLUMN_GAP
@@ -1094,6 +954,7 @@ def draw_board(
     )
 
 
+# Shows game
 def draw_game(
     screen,
     graphics,
@@ -1104,8 +965,6 @@ def draw_game(
     current_player,
     displayed_pips
 ):
-    """Wyświetla aktualny stan gry wraz z punktacją."""
-
     layout = get_layout()
 
     board_x = layout["board_x"]
@@ -1119,7 +978,6 @@ def draw_game(
     green_desk_x = layout["green_desk_x"]
     green_desk_y = layout["green_desk_y"]
 
-    # Pobranie aktualnych wyników z backendu
     player_1_score = mechanics.calculate_score(
         player_1_columns
     )
@@ -1128,7 +986,6 @@ def draw_game(
         player_2_columns
     )
 
-    # Player 1, pomarańczowy, u góry
     draw_board(
         screen,
         graphics["column_orange"],
@@ -1139,7 +996,6 @@ def draw_game(
         player=1
     )
 
-    # Player 2, zielony, na dole
     draw_board(
         screen,
         graphics["column_green"],
@@ -1150,7 +1006,6 @@ def draw_game(
         player=2
     )
 
-    # Wyniki kolumn Player 1, pod planszą
     draw_column_scores(
         screen,
         score_font,
@@ -1161,7 +1016,6 @@ def draw_game(
         color=TEXT_COLOR_1W
     )
 
-    # Wyniki kolumn Player 2, nad planszą
     draw_column_scores(
         screen,
         score_font,
@@ -1172,19 +1026,16 @@ def draw_game(
         color=TEXT_COLOR_2W
     )
 
-    # Biurko Player 1
     screen.blit(
         graphics["desk_orange"],
         (orange_desk_x, orange_desk_y)
     )
 
-    # Biurko Player 2
     screen.blit(
         graphics["desk_green"],
         (green_desk_x, green_desk_y)
     )
 
-    # Nazwa i total Player 1
     draw_player_info(
         screen,
         label_font,
@@ -1197,7 +1048,6 @@ def draw_game(
         info_position="below"
     )
 
-    # Nazwa i total Player 2
     draw_player_info(
         screen,
         label_font,
@@ -1210,7 +1060,6 @@ def draw_game(
         info_position="above"
     )
 
-    # Wylosowana liczba na biurku aktywnego gracza
     if current_player == 1:
         draw_rolled_die(
             screen,
@@ -1229,17 +1078,11 @@ def draw_game(
         )
 
 
+# Detecting which column was clicked by the active player
 def get_clicked_column(
     mouse_position,
     current_player
 ):
-    """
-    Sprawdza, czy kliknięto kolumnę aktywnego gracza.
-
-    Zwraca indeks 0, 1 lub 2.
-    Zwraca None, jeśli nie kliknięto kolumny.
-    """
-
     layout = get_layout()
 
     if current_player == 1:
@@ -1259,24 +1102,24 @@ def get_clicked_column(
     return None
 
 
+# Changes keyboard input to column index
 def get_keyboard_column(key):
-    """
-    Zamienia klawisz 1, 2 lub 3
-    na indeks kolumny 0, 1 lub 2.
-    """
-
     key_to_column = {
         pygame.K_1: 0,
         pygame.K_2: 1,
         pygame.K_3: 2,
         pygame.K_KP1: 0,
         pygame.K_KP2: 1,
-        pygame.K_KP3: 2
+        pygame.K_KP3: 2,
+        pygame.K_8: 0,
+        pygame.K_9: 1,
+        pygame.K_0: 2
     }
 
     return key_to_column.get(key)
 
 
+# Tries to do move by player, if True it is done
 def try_move(
     current_player,
     current_pips,
@@ -1284,12 +1127,6 @@ def try_move(
     player_1_columns,
     player_2_columns
 ):
-    """
-    Próbuje wykonać ruch aktywnego gracza.
-
-    Zwraca True, jeśli kostka została umieszczona.
-    """
-
     if current_player == 1:
         player_columns = player_1_columns
         opponent_columns = player_2_columns
@@ -1325,12 +1162,11 @@ def try_move(
     return True
 
 
+# Who wins? Print
 def print_winner(
     player_1_columns,
     player_2_columns
 ):
-    """Wyświetla końcowy wynik w konsoli."""
-
     score_1 = mechanics.calculate_score(
         player_1_columns
     )
@@ -1362,6 +1198,8 @@ def print_winner(
     else:
         print("It's a tie!")
 
+
+# Overlay for game over state
 def draw_game_over_overlay(
     screen,
     graphics,
@@ -1371,11 +1209,6 @@ def draw_game_over_overlay(
     player_1_columns,
     player_2_columns
 ):
-    """
-    Przyciemnia ekran, wyświetla wynik
-    i rysuje przycisk powrotu do menu.
-    """
-
     score_1 = mechanics.calculate_score(
         player_1_columns
     )["total"]
@@ -1454,80 +1287,35 @@ def draw_game_over_overlay(
     return retry_rect
 
 
+# Main function to run the game
 def run_frontend():
-    """Uruchamia menu i główną pętlę gry."""
-
     pygame.init()
 
-    screen = pygame.display.set_mode(
-        (WINDOW_WIDTH, WINDOW_HEIGHT)
-    )
+    screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
-    pygame.display.set_caption(
-        "Knucklebones"
-    )
+    pygame.display.set_caption("Knucklebones")
 
-    label_font = pygame.font.Font(
-        str(FONT_PATH),
-        24
-    )
+    icon = pygame.image.load(
+        str(GRAPHICS_DIR / "dice_3.png")
+    ).convert_alpha()
+    
+    pygame.display.set_icon(icon)
 
-    score_font = pygame.font.Font(
-        str(FONT_PATH),
-        16
-    )
-
-    winner_font = pygame.font.Font(
-        str(FONT_PATH),
-        48
-    )
-
-    final_score_font = pygame.font.Font(
-        str(FONT_PATH),
-        20
-    )
-
-    title_font = pygame.font.Font(
-        str(FONT_PATH),
-        60
-    )
-
-    small_button_font = pygame.font.Font(
-        str(FONT_PATH),
-        22
-    )
-
-    big_button_font = pygame.font.Font(
-        str(FONT_PATH),
-        36
-    )
-
-    footer_font = pygame.font.Font(
-        str(FONT_PATH),
-        11
-    )
-
-    rules_title_font = pygame.font.Font(
-        str(FONT_PATH),
-        34
-    )
-
-    rules_text_font = pygame.font.Font(
-        str(FONT_PATH),
-        13
-    )
-
-    rules_fun_font = pygame.font.Font(
-        str(FONT_PATH),
-        20
-    )
+    label_font = pygame.font.Font(str(FONT_PATH),24)
+    score_font = pygame.font.Font(str(FONT_PATH),16)
+    winner_font = pygame.font.Font(str(FONT_PATH),48)
+    final_score_font = pygame.font.Font(str(FONT_PATH),20)
+    title_font = pygame.font.Font(str(FONT_PATH),60)
+    small_button_font = pygame.font.Font(str(FONT_PATH),22)
+    big_button_font = pygame.font.Font(str(FONT_PATH),36)
+    footer_font = pygame.font.Font(str(FONT_PATH),11)
+    rules_title_font = pygame.font.Font(str(FONT_PATH),34)
+    rules_text_font = pygame.font.Font(str(FONT_PATH),13)
+    rules_fun_font = pygame.font.Font(str(FONT_PATH),20)
 
     graphics = load_graphics()
 
-    # Dostępne stany:
-    # "menu", "game", "game_over"
     game_state = "menu"
-
     game = create_new_game()
 
     play_rect = None
@@ -1541,7 +1329,6 @@ def run_frontend():
     while running:
         current_time = pygame.time.get_ticks()
 
-        # Animacja kostki działa wyłącznie podczas gry
         if (
             game_state == "game"
             and game["rolling"]
@@ -1591,7 +1378,6 @@ def run_frontend():
                 ):
                     game_state = "menu"
 
-                # Opcjonalnie ESC również zamyka zasady
                 elif (
                     event.type == pygame.KEYDOWN
                     and event.key == pygame.K_ESCAPE
@@ -1643,7 +1429,7 @@ def run_frontend():
 
                 continue
 
-            # W trakcie animacji nie można stawiać kostki
+
             if game["rolling"]:
                 continue
 
@@ -1693,7 +1479,7 @@ def run_frontend():
                 game_state = "game_over"
                 continue
 
-            # Zmiana aktywnego gracza
+            # Changing the current player and rolling a new die
             if game["current_player"] == 1:
                 game["current_player"] = 2
             else:
@@ -1712,7 +1498,7 @@ def run_frontend():
                 "roll_start_time"
             ]
 
-        # RYSOWANIE MENU
+        # Drawing MENU
         if game_state in ("menu", "rules"):
 
             play_rect, rules_rect = draw_menu(
@@ -1735,7 +1521,7 @@ def run_frontend():
                     rules_fun_font
                 )
 
-        # RYSOWANIE GRY ORAZ GAME OVER
+        # Drawing game and game over
         else:
             screen.blit(
                 graphics["background"],
@@ -1770,5 +1556,6 @@ def run_frontend():
     pygame.quit()
 
 
+# Lets gooo
 if __name__ == "__main__":
     run_frontend()
