@@ -52,6 +52,9 @@ Knucklebones/
 **Run the game:**
 
 ```bash
+pip install pygame
+```
+```bash
 python frontend.py
 ```
 
