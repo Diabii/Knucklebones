@@ -39,7 +39,7 @@ The game ends when either player's board is completely filled.
 ```text
 Knucklebones/
 ├── frontend.py
-├── Main.py
+├── main.py
 └── Graphics/
 ```
 
